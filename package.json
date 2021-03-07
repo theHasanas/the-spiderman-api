@@ -1,0 +1,11 @@
+{
+  "name": "the-spiderman-api",
+  "version": "1.0.0",
+  "description": "A terrible API because it uses Marvel",
+  "main": "app.js",
+  "author": "theHasanas <30086691+theHasanas@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
