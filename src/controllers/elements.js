@@ -1,6 +1,7 @@
 const { pageElements } = require("../data");
 
 exports.createElement = (request, response) => {
+  const file = request.file;
   const elements = request.body.elements;
 
   try {

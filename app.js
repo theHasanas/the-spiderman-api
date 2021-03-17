@@ -1,13 +1,15 @@
 const express = require("express");
 const cors = require("cors");
-const db = require("./db/models");
-const { Student } = require("./db/models");
+const path = require("path");
+
+// import database stuff
+const db = require("./src/db/models");
+const { Student } = require("./src/db/models");
 // import routers
-const homeRoutes = require("./routes/home");
-const loginRoutes = require("./routes/login");
-const elementsRoutes = require("./routes/elements");
-const otherRoutes = require("./routes/others");
-const student = require("./db/models/student");
+const homeRoutes = require("./src/routes/home");
+const loginRoutes = require("./src/routes/login");
+const elementsRoutes = require("./src/routes/elements");
+const otherRoutes = require("./src/routes/others");
 
 // initialise app
 const app = express();
@@ -15,6 +17,15 @@ const app = express();
 // middleware
 app.use(cors());
 app.use(express.json());
+
+// media
+app.use("/media", express.static(path.join(__dirname, "media")));
+
+// app.post("/media", upload.single("image"), (request, response) => {
+//   console.log(request.file.name);
+//   console.log(request.body);
+//   response.end();
+// });
 
 // routes
 app.use("/", homeRoutes);
