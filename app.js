@@ -4,7 +4,7 @@ const path = require("path");
 
 // import database stuff
 const db = require("./src/db/models");
-const { Student } = require("./src/db/models");
+const { Student, University } = require("./src/db/models");
 // import routers
 const homeRoutes = require("./src/routes/home");
 const loginRoutes = require("./src/routes/login");
@@ -43,25 +43,77 @@ app.get("/students", async (_, response) => {
   }
 });
 
+app.get("/students/:studentId", async (request, response) => {
+  try {
+    const student = await Student.findByPk(request.params.studentId, {
+      include: {
+        model: University,
+        attributes: ["name"],
+      },
+    });
+    console.log("Fetched student", student);
+    response.status(200).json(student);
+  } catch (error) {
+    console.log("Failed to fetch student:", error);
+  }
+});
+
 app.post("/students", async (request, response) => {
   try {
+    const university = await University.findOne({
+      where: {
+        name: request.body.university,
+      },
+    });
+
     const newStudent = await Student.create({
       firstName: request.body.firstName,
       lastName: request.body.lastName,
       email: request.body.email,
+      universityId: university.id,
     });
 
     console.log("Created student", newStudent);
     response.status(201).json(newStudent);
   } catch (error) {
-    console.log("Failed to fetch all students:", error);
+    console.log("Failed to create new student:", error);
   }
 });
+
+app.get("/universities", async (_, response) => {
+  try {
+    const universities = await University.findAll();
+    console.log("Fetched universities", universities);
+    response.status(200).json(universities);
+  } catch (error) {
+    console.log("Failed to fetch all universities:", error);
+  }
+});
+
+app.post("/universities", async (request, response) => {
+  try {
+    const newUniversity = await University.create({
+      name: request.body.name,
+      country: request.body.country,
+    });
+
+    console.log("Created university", newUniversity);
+    response.status(201).json(newUniversity);
+  } catch (error) {
+    console.log("Failed to create new university:", error);
+  }
+});
+
+app.post(
+  "/universities/:universityId/students",
+  async (request, response) => {}
+);
 
 // start express app
 const run = async () => {
   try {
-    await db.sequelize.sync();
+    await db.sequelize.sync({ force: true });
+    // await db.sequelize.sync();
     console.log("Server connected to database successfully.");
 
     app.listen(8000, () => {
