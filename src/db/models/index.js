@@ -44,6 +44,7 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 db.University.hasMany(db.Student, {
+  as: "students",
   foreignKey: {
     name: "universityId",
     allowNull: false,
@@ -51,8 +52,8 @@ db.University.hasMany(db.Student, {
 });
 
 db.Student.belongsTo(db.University, {
-  foreignKey: "studentId",
   as: "university",
+  foreignKey: "universityId",
 });
 
 module.exports = db;

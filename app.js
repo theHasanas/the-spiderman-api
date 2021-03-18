@@ -33,9 +33,18 @@ app.use("/signin", loginRoutes);
 app.use("/elements", elementsRoutes);
 app.use(otherRoutes);
 
+const studentObjectOptions = {
+  attributes: { exclude: ["createdAt", "updatedAt", "universityId"] },
+  include: {
+    model: University,
+    as: "university",
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  },
+};
+
 app.get("/students", async (_, response) => {
   try {
-    const students = await Student.findAll();
+    const students = await Student.findAll(studentObjectOptions);
     console.log("Fetched students", students);
     response.status(200).json(students);
   } catch (error) {
@@ -45,12 +54,10 @@ app.get("/students", async (_, response) => {
 
 app.get("/students/:studentId", async (request, response) => {
   try {
-    const student = await Student.findByPk(request.params.studentId, {
-      include: {
-        model: University,
-        attributes: ["name"],
-      },
-    });
+    const student = await Student.findByPk(
+      request.params.studentId,
+      studentObjectOptions
+    );
     console.log("Fetched student", student);
     response.status(200).json(student);
   } catch (error) {
@@ -82,7 +89,14 @@ app.post("/students", async (request, response) => {
 
 app.get("/universities", async (_, response) => {
   try {
-    const universities = await University.findAll();
+    const universities = await University.findAll({
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      include: {
+        model: Student,
+        as: "students",
+        attributes: { exclude: ["createdAt", "updatedAt", "universityId"] },
+      },
+    });
     console.log("Fetched universities", universities);
     response.status(200).json(universities);
   } catch (error) {
@@ -112,8 +126,8 @@ app.post(
 // start express app
 const run = async () => {
   try {
-    await db.sequelize.sync({ force: true });
-    // await db.sequelize.sync();
+    // await db.sequelize.sync({ force: true });
+    await db.sequelize.sync();
     console.log("Server connected to database successfully.");
 
     app.listen(8000, () => {
